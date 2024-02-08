@@ -82,13 +82,13 @@ func (rb requestBodyApi) validateBodyRequest() error {
 		return errors.New("method not allowed")
 	}
 
-	rgx, err := regexp.Compile(`[A-Za-z]+$`)
+	rgx, err := regexp.Compile(`[A-Za-z1-9]+$`)
 	if err != nil {
 		return err
 	}
 
 	if !rgx.MatchString(rb.Url) {
-		return errors.New("url must alphabet")
+		return errors.New("url must alphanumeric")
 	}
 
 	response := make(map[string]interface{})
