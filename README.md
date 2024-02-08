@@ -10,7 +10,7 @@ go run main.go
 ```
 
 ## Open index html
-to try this app, open `~/jojonomic-test/index.html`
+to try this app, open `~/jojonomic-test/html/index.html`
 
 ## Example
 ### Create mock api
