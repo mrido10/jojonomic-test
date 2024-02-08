@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mock API</title>
+    <style>
+        body{
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+        }
+        #container {
+            display: flex;
+            flex-direction: row;
+            gap: 100px
+        }
+
+        #list {
+            display: flex;
+            flex-direction: column;
+            width: 300px;
+        }
+
+        #list-api {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+            padding: 30px 0;
+
+            
+        }
+
+        #box-response {
+            
+        }
+        
+        #response {
+            width: 100%;
+            word-wrap: break-word;
+            overflow: hidden;
+
+            background-color: #555;
+            color: #fff;  
+            padding: 10px;  
+        }
+
+        #create {
+            display: flex;
+            flex-direction: column;
+            width: 300px;
+            gap: 7px
+        }
+
+        input,textarea,button {
+            width: 100%;
+            height: 30px;
+        }
+        
+        textarea {
+            height: 100px;
+        }
+
+
+    </style>
+    <script>
+        let listAPI = {}
+        function getListAPI() {
+            const resp = async () => {
+                const resp = await fetch("http://localhost:8000/api", {
+                    method: "GET"
+                })
+                return await resp.json()
+            } 
+            
+            resp().then(data => {
+                let htmlStr = "<label>List</label>"
+                data.list_api.map(val => {
+                    listAPI[val.url] = val
+                    htmlStr += `<button name="${val.url}" onclick="fetchData('${val.url}')">${val.name}</button>`
+                })
+
+                document.getElementById("list-api").innerHTML = htmlStr
+            })
+        }
+
+        function fetchData(url) {
+            const data = listAPI[url]
+            const resp = async () => {
+                const resp = await fetch(`http://${data.url}`, {
+                    method: data.method
+                })
+                return await resp.json()
+            } 
+            resp().then(data => {
+                document.getElementById("response").innerHTML = JSON.stringify(data, undefined, 2)
+            })
+        }
+
+        function setListAPI() {
+            let name = document.getElementById("name").value
+            let endpoint = document.getElementById("endpoint").value
+            let method = document.getElementById("method").value
+            let responseExpect = document.getElementById("exp-response").value
+
+            let body = {
+                name: name,
+                url: endpoint,
+                method: method,
+                response: responseExpect
+            }
+
+            fetch("http://localhost:8000/api", {
+                method: "POST",
+                headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(body)
+            }).then(resp => {
+                return resp.json()
+            }).then(resp => {
+                alert(JSON.stringify(resp))
+            })
+            .catch(err => {
+                alert(err)
+            })
+        }
+    </script>
+</head>
+<body>
+    <div id="container">
+        <div id="list">
+            <label>List API</label>
+            <button onclick="getListAPI()">Get List API</button>
+            <div id="list-api">
+                <label>List</label>
+            </div>
+            <div id="box-response">
+                <pre id="response"></pre>
+            </div>
+        </div>
+        <div id="create">
+            <label for="container">Create API</label>
+            <input id="name" placeholder="Name" type="text"/>
+            <input id="endpoint" placeholder="Endpoint" type="text"/>
+            <input id="method" placeholder="method" type="text"/>
+            <textarea  id="exp-response" placeholder="Expect Result"></textarea>
+            <button  id="save" type="button" onclick="setListAPI()">Create</button>
+        </div>
+    </div>
+</body>
+</html>
